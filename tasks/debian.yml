@@ -3,7 +3,7 @@
 - name: Copy default interfaces file
   become: True
   ansible.builtin.template:
-    src: "{{ playbook_dir }}/files/interfaces"
+    src: "{{ role_path }}/files/debian/interfaces_file.j2"
     dest: "/etc/network/interfaces"
     mode: 0644
     owner: root
@@ -13,7 +13,7 @@
 - name: Configure interfaces
   become: True
   ansible.builtin.template:
-    src: "{{ playbook_dir }}/files/interface.j2"
+    src: "{{ role_path }}/files/debian/individual_interface.j2"
     dest: "/etc/network/interfaces.d/{{ item.name }}.cfg"
     mode: 0644
     owner: root
