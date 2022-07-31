@@ -1,0 +1,37 @@
+---
+
+- name: Copy default interfaces file
+  become: True
+  ansible.builtin.template:
+    src: "{{ role_path }}/files/debian/interfaces_file.j2"
+    dest: "/etc/network/interfaces"
+    mode: 0644
+    owner: root
+    group: root
+  register: root_interface_file
+  notify:
+    - Restart networking stack
+
+- name: Configure interfaces
+  become: True
+  ansible.builtin.template:
+    src: "{{ role_path }}/files/debian/individual_interface.j2"
+    dest: "/etc/network/interfaces.d/{{ item.name }}.cfg"
+    mode: 0644
+    owner: root
+    group: root
+  loop: "{{ network_interfaces }}"
+  when:
+    - item.preconf is not defined or (not item.preconf if item.preconf is defined)
+  register: interface_files
+  notify:
+    - Restart networking stack
+
+- name: Restart interfaces
+  become: True
+  ansible.builtin.shell: ifdown "{{ item.item.name }}" --force --ignore-errors && ifup "{{ '-a' if (item.item.root_interface is defined and item.item.root_interface) else item.item.name }}"
+  loop: "{{ interface_files.results }}"
+  when: 
+    - not interface_files.changed
+    - not root_interface_file.changed
+    - item.changed

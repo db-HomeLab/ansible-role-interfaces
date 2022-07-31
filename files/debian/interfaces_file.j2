@@ -1,0 +1,13 @@
+{{ ansible_managed | comment}}
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+
+{% for server in dns_nameservers %}
+dns-nameservers {{ server }}
+{% endfor %}
+dns-search {{ dns_search_domain }}

@@ -1,0 +1,16 @@
+---
+
+network_interfaces:
+
+  - name: eno1
+    mtu: 9000
+    method: 'manual'
+    root_interface: True
+
+  - name: eno1.10
+    mtu: 1500
+    method: 'static'
+    address: 10.0.0.1
+    netmask: 255.255.255.0
+    gateway: 10.0.0.254
+    vlan_device: eno1
